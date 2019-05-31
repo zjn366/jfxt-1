@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>公告详情</title>
+    <link rel="stylesheet" href="css/weui.min.css">
+    <link rel="stylesheet" href="css/jquery-weui.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <link rel="stylesheet" href="css/icon.css">
+    <script src="js/zepto.min.js"></script>
+    <script src="js/swipe.js"></script>
+    <script src="js/common.js"></script>
+</head>
+<body ontouchstart>
+<div class="weui_btn_primary weui-header ">
+    <div class="weui-header-left"> <a href="index1.html" class="icon icon-109 f-white"></a>  </div>
+    <h1 class="weui-header-title">公告</h1>
+    <!--<div class="weui-header-right"><a class="icon icon-22 f-white"></a></div>-->
+</div>
+<div class="kong2"></div>
+<div class="weui-weixin">
+    <div class="weui-weixin-ui" id="gg_detail">
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    var id = GetArgsFromHref("ggid");
+    $(function (){
+            $.post(
+                getContextPath()+"/app/ggDetail",
+                {
+                    "id":id
+                },
+                function (data) {
+                    if(data.code == 1) {
+                        var  obj = data.data;
+                        var gg_detail_html = '';
+                        gg_detail_html +=
+                            '<div class="weui-weixin-page">'+
+                            '<h2 class="weui-weixin-title">'+obj.ggbt+'</h2>'+
+                            '<div class="weui-weixin-info">'+
+                            '<span class="weui-weixin-em" >'+obj.fbr.name+'</span>'+
+                            '<em class="weui-weixin-em" >'+obj.fbrq+'</em>'+
+                            '</div>'+
+                            '<div class="weui-weixin-content">'+obj.ggnr+'</div>'+
+                            '<div class="weui-weixin-img">'+
+                            '<a href="xunjian.html?ggid='+obj.id+'" class="weui-btn weui-btn_primary">上传现场照片</a>'+
+                            '</div>'+
+                            '</div>'
+                        $("#gg_detail").html(gg_detail_html);
+                    } else {
+                        $.toast(data.msg,'forbidden', 8000);
+                    }
+                });
+    });
+</script>
+</html>

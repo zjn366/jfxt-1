@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.merchant.dao.JfXxDao">
+    
+	<sql id="jfXxColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.jfwz AS "jfwz",
+		a.jfbh AS "jfbh",
+		a.jfjj AS "jfjj",
+		a.jfxctp AS "jfxctp",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.kzzd1 AS "kzzd1",
+		a.kzzd2 AS "kzzd2",
+		a.kzzd3 AS "kzzd3",
+		a.kzzd4 AS "kzzd4"
+	</sql>
+	
+	<sql id="jfXxJoins">
+	</sql>
+    
+	<select id="get" resultType="JfXx">
+		SELECT 
+			<include refid="jfXxColumns"/>
+		FROM jf_xx a
+		<include refid="jfXxJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="JfXx">
+		SELECT 
+			<include refid="jfXxColumns"/>
+		FROM jf_xx a
+		<include refid="jfXxJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="jfjj != null and jfjj != ''">
+				AND a.jfjj LIKE 
+					<if test="dbName == 'oracle'">'%'||#{jfjj}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{jfjj}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{jfjj},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		<if test="limit != null and limit != ''">
+			limit ${limit},10
+		</if>
+	</select>
+	
+	<select id="findAllList" resultType="JfXx">
+		SELECT 
+			<include refid="jfXxColumns"/>
+		FROM jf_xx a
+		<include refid="jfXxJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO jf_xx(
+			id,
+			name,
+			jfwz,
+			jfbh,
+			jfjj,
+			jfxctp,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			kzzd1,
+			kzzd2,
+			kzzd3,
+			kzzd4
+		) VALUES (
+			#{id},
+			#{name},
+			#{jfwz},
+			#{jfbh},
+			#{jfjj},
+			#{jfxctp},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{kzzd1},
+			#{kzzd2},
+			#{kzzd3},
+			#{kzzd4}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE jf_xx SET 	
+			name = #{name},
+			jfwz = #{jfwz},
+			jfbh = #{jfbh},
+			jfjj = #{jfjj},
+			jfxctp = #{jfxctp},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag},
+			kzzd1 = #{kzzd1},
+			kzzd2 = #{kzzd2},
+			kzzd3 = #{kzzd3},
+			kzzd4 = #{kzzd4}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE jf_xx SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

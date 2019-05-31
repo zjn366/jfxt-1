@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>处罚单</title>
+    <link rel="stylesheet" href="css/weui.min.css">
+    <link rel="stylesheet" href="css/jquery-weui.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <link rel="stylesheet" href="css/icon.css">
+    <script src="js/jquery-2.1.4.js"></script>
+    <script src="js/fastclick.js"></script>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/swipe.js"></script>
+    <script src="html5plus://ready"></script>
+    <script src="js/jquery-weui.js"></script>
+    <script src="js/common.js"></script>
+</head>
+<body ontouchstart>
+<div class="weui_btn_primary weui-header ">
+    <div class="weui-header-left"> <a href="index1.html" class="icon icon-109 f-white"></a>  </div>
+    <h1 class="weui-header-title">new处罚单</h1>
+    <input type="text" value="" style="display: none" id="cfId">
+</div>
+<div class="kong2"></div>
+<div class="weui-cells">
+    <!--<div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">单号</label></div>
+        <div class="weui-cell__bd">
+            <span style="border: 0px;" value="" id="cftzd"></span>
+        </div>
+    </div>-->
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="" class="weui-label">日期</label></div>
+        <div class="weui-cell__bd">
+            <input class="weui-input" id="years-monthes" type="text" value="" placeholder="请选日期时间" readonly="readonly" >
+            <!--<input class="weui-input" type="date" value=" " id="cfrq">-->
+        </div>
+    </div>
+
+</div>
+<div class="weui-cells__title">网元</div>
+<div class="weui-cells ">
+    <div class="weui-cell weui-cell_select">
+        <div class="weui-cell__bd" id="cfjf">
+            <input type="text" value="" id="jf_ids" style="display: none;"/>
+            <select class="weui-select"  onchange="selectedJf(this.value)"  name="jfLists" id="jfXx_list">
+            </select>
+        </div>
+    </div>
+</div>
+<div class="weui-cells__title">处罚人</div>
+<div class="weui-cells weui-cells_radio">
+    <label class="weui-cell weui-check__label" for="x12">
+        <input id="user_id" value="" style="display: none">
+        <div class="weui-cell__bd" id="user_name">
+        </div>
+        <div class="weui-cell__ft">
+            <input type="radio" class="weui-check" name="radio2" id="x12" checked="checked">
+            <span class="weui-icon-checked"></span>
+        </div>
+    </label>
+</div>
+<div class="weui-cells__title">处罚对象</div>
+<div class="weui-cells ">
+    <div class="weui-cell weui-cell_select">
+        <div class="weui-cell__bd">
+            <input type="text" value="" id="cfdx_ids" style="display: none;"/>
+            <select class="weui-select" onchange="selectedCfdx(this.value)" name="select1" id="cfDx_list">
+
+            </select>
+        </div>
+    </div>
+</div>
+<div class="weui-cells__title">处罚梯度</div>
+<div class="weui-cells ">
+    <div class="weui-cell weui-cell_select">
+        <div class="weui-cell__bd" >
+            <input type="text" value="" id="cftd_ids" style="display: none;"/>
+            <select class="weui-select" name="select1" onchange="selectedCftd(this.value)" id="cfTd_list">
+
+            </select>
+        </div>
+    </div>
+</div>
+<div class="weui-gallery" id="gallery">
+    <span class="weui-gallery__img" id="galleryImg"></span>
+</div>
+<div class="weui-cells__title">上传现场照片</div>
+<div class="weui-cells sczp">
+    <div class="weui-uploader__bd">
+        <ul class="weui-uploader__files" id="img2x">
+        </ul>
+        <div class="weui-uploader__input-box">
+            <form id="uploadImgForm">
+                <div id="img">
+                    <div class="weui-uploader__input" type="file" id="imgFile" name="imgFile" accept="image/jpg,image/jpeg,image/png,image/gif" multiple></div>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+    <input type="button" value="清空图片" onclick="deleteImg()"/>
+</div>
+<div class="weui-cells__title">处罚原因</div>
+
+<div class="weui-cells ">
+    <div class="weui-cell">
+        <div class="weui-cell__bd">
+            <textarea class="weui-textarea" placeholder="请输入原因" rows="3" id="cfyyms"></textarea>
+            <div class="weui-textarea-counter"><span>0</span>/200</div>
+        </div>
+    </div>
+</div>
+<div class="weui-cells">
+    <a href="#"  class="weui-btn weui-btn_primary" onclick="saveCf()">提交</a>
+
+</div>
+</body>
+
+
+<script type="text/javascript">
+    $(function(){
+    	
+    	//实例化fastClick插件
+    	FastClick.attach(document.body) ;
+    	
+    	 //获取浏览器本地存储空间对象localStrage
+        var storage=window.localStorage;
+        //通过localStrage获取到存储其中的登录名
+        var userId = storage.getItem("loginName");
+        findUser(userId);
+        
+        //c初始化网元选项
+        findAlljf();
+    	
+    	//初始化处罚对象和处罚梯度
+    	findDict();
+    	findDict1();
+    	
+        var tmpl = '<li class="weui-uploader__file" style="background-image:url(#url#)"></li>',
+            $gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
+            $uploaderInput = $("#uploaderInput"),
+            $uploaderFiles = $("#uploaderFiles")
+        ;
+
+        $uploaderInput.on("change", function(e){
+            var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
+            for (var i = 0, len = files.length; i < len; ++i) {
+                var file = files[i];
+
+                if (url) {
+                    src = url.createObjectURL(file);
+                } else {
+                    src = e.target.result;
+                }
+
+                $uploaderFiles.append($(tmpl.replace('#url#', src)));
+            }
+        });
+        
+        $uploaderFiles.on("click", "li", function(){
+            $galleryImg.attr("style", this.getAttribute("style"));
+            $gallery.fadeIn(100);
+        });
+        
+        $gallery.on("click", function(){
+            $gallery.fadeOut(100);
+        });
+    });
+</script>
+<script type="text/javascript">
+   
+  //获取路径中的参数
+    var id = GetArgsFromHref("cfid");
+
+	//时间日期的值
+	 var displayValues = $("#years-monthes").val();
+
+	//初始化处罚单日期
+    $("#years-monthes").datetimePicker({
+    title:"选择日期时间",
+    min:'2015-12-10',
+    max:'2050-10-01',
+    onChange: function (picker, values, displayValues) {
+        values = $("#years-monthes").val();
+        console.log(values);
+    }});
+
+    //选中网元
+    function selectedJf(a) {
+        $("#jf_ids").val(a);
+    }
+    //选中处罚对象
+    function selectedCfdx(a) {
+        $("#cfdx_ids").val(a);
+    }
+    //选中处罚梯度
+    function selectedCftd(a) {
+        $("#cftd_ids").val(a);
+    }
+    //字典-惩罚对象的列表集
+    function findDict() {
+        var dict = {};
+        dict.type = "cfdx";
+        var cfDxid = $("#cfdx_ids").val();//表单中对象的值
+        $.post(
+            getContextPath()+"/app/cfZdList",
+            dict,
+            function (data) {
+                if(data.code == 1) {
+                    var arr = data.data;
+                    var cfDx_list = "<option selected value='0'>请选择处罚对象</option>";
+                    for (var i = 0; i < arr.length; i++) {
+                        var obj = arr[i];
+                        var cfDxiD = obj.value;
+                        var str="";
+                        if(cfDxiD==cfDxid){
+                            str="<option selected value='"+obj.value+"'>"+obj.label+"</option>";
+                        }else{
+                            str="<option value='"+obj.value+"'>"+obj.label+"</option>";
+                        }
+                        cfDx_list+=str;
+                    }
+                    $("#cfDx_list").html(cfDx_list);
+                } else {
+                    $.toast(data.msg,'forbidden', 8000);
+                }
+            });
+    }
+    //字典-惩罚梯度
+    function findDict1() {
+        var dict = {};
+        var cfTdid = $("#cftd_ids").val();
+        dict.type = "cftd";
+        $.post(
+            getContextPath()+"/app/cfZdList",
+            dict,
+            function (data) {
+                if(data.code == 1) {
+                    var arr = data.data;
+                    var cfTd_list = "<option selected value='0'>请选择处罚梯度</option>";
+                    for (var i = 0; i < arr.length; i++) {
+                        var obj = arr[i];
+                        var cfTdiD = obj.value;
+                        var str="";
+                        if(cfTdiD==cfTdid){
+                            str="<option selected value='"+obj.value+"'>"+obj.label+"</option>";
+                        }else{
+                            str="<option value='"+obj.value+"'>"+obj.label+"</option>";
+                        }
+                        cfTd_list+=str;
+                    }
+                    $("#cfTd_list").html(cfTd_list);
+                } else {
+                    $.toast(data.msg,'forbidden', 8000);
+                }
+            });
+    }
+    //查询登录用户
+    function findUser(userId){
+        $.post(
+            getContextPath()+"/app/findUser",
+            {
+                "id": userId
+            },
+            function (data) {
+                if(data.code == 1) {
+                    var obj = data.data;
+                    $("#user_name").text(obj.name);
+                    $("#user_id").val(obj.id);
+                } else {
+                    $.toast(data.msg,'forbidden', 8000);
+                }
+            });
+    }
+    //查询所有网元
+    function findAlljf(){
+       var jfId =  $("#jf_ids").val();
+            $.post(
+                getContextPath()+"/app/jfList",
+                {
+
+                },
+                function (data) {
+                    if(data.code == 1) {
+                        var arr = data.data;
+                        var jfXx_list = "<option selected value='0' value=''>请选择网元</option>";
+                        for (var i = 0; i < arr.length; i++) {
+                            var obj = arr[i];
+                            var jfID = obj.id;
+                            var str="";
+                            if(jfID==jfId){
+                                str="<option selected value='1' value='"+obj.id+"'>"+obj.name+"</option>";
+                            }else{
+                                str="<option value='"+obj.id+"'>"+obj.name+"</option>";
+                            }
+                            jfXx_list+=str;
+                        }
+                        $("#jfXx_list").html(jfXx_list);
+                    } else {
+                        $.toast(data.msg,'forbidden', 8000);
+                    }
+                });
+    }
+
+	var imgArr = new Array(); //保存多图片路径
+    var imgUrls = "";
+
+    if(window.plus) {
+        plusReady();
+    } else {
+        document.addEventListener("plusready", plusReady, false);
+    }
+    // 扩展API准备完成后要执行的操作
+    function plusReady() {
+        var ws = plus.webview.currentWebview();
+        //pw回车可输出plus.webview // ... code
+    }
+
+    //点击事件，弹出选择摄像头和相册的选项
+    $("#imgFile").click(
+        function showActionSheet() {
+            var bts = [{
+                title: "拍照"
+            }, {
+                title: "从相册选择"
+            }];
+
+            plus.nativeUI.actionSheet({
+                    cancel: "取消",
+                    buttons: bts
+                },
+                function(e) {
+                    if(e.index == 1) {
+                        getImage();
+                    } else if(e.index == 2) {
+                        galleryImgs();
+                    }
+                }
+            );
+        }
+    );
+
+    //调用相机拍照
+    function getImage() {
+        var cmr = plus.camera.getCamera();
+        cmr.captureImage(function(p) {
+            plus.io.resolveLocalFileSystemURL(p, function(entry) {
+                //转为base64并提交到后台
+                uploadImg(entry.toLocalURL());
+                //compressImage(entry.toLocalURL(),entry.name);
+            }, function(e) {
+                plus.nativeUI.toast("读取拍照文件错误：" + e.message);
+            });
+        }, function(e) {}, {
+            filter: 'image'
+        });
+    }
+    //从相册选择照片
+    function galleryImgs() {
+        plus.gallery.pick(function(p) {
+            plus.io.resolveLocalFileSystemURL(p, function(entry) {
+                //转为base64并提交到后台
+                uploadImg(entry.toLocalURL());
+                //compressImage(entry.toLocalURL(),entry.name);
+            }, function(e) {
+                plus.nativeUI.toast("读取拍照文件错误：" + e.message);
+            });
+        }, function(e) {}, {
+            filename: "_doc/camera/",
+            filter: "image"
+        });
+
+    }
+
+    //图片上传
+    function uploadImg(imgPath) {
+        var image = new Image();
+        image.onload = function() {
+            var imgData = getBase64Image(image);
+            var formData = new FormData($("#uploadImgForm")[0]);
+            $.post(
+                getContextPath() + "/app/uploadImg", {
+                    "imgData": imgData,
+                },
+                function(data) {
+                    if(data.code == 1) {
+                        var obj = data.data;
+                        imgArr.push(obj);
+                        $('#img2x').append('<img src="'+ getFilePath() + obj +'" style="width: 100px;height: 80px;margin-left:15px;"/>');
+                        //$('#img2x').append('<li class="weui-uploader__input-box" style="background-image:url(' + getFilePath() + obj + ')">');
+                    } else {
+                        alert(data.msg);
+                    }
+
+                });
+        }
+        image.src = imgPath;
+        image.style.width = "60px";
+        image.style.height = "60px";
+    }
+
+    //将图片压缩转成base64
+    function getBase64Image(img) {
+
+        var canvas = document.createElement("canvas");
+        var width = img.width;
+        var height = img.height;
+
+        if(width > height) {
+            if(width > 100) {
+                height = Math.round(height *= 800 / width);
+                width = 400;
+            }
+        } else {
+            if(height > 100) {
+                width = Math.round(width *= 800 / height);
+                height = 400;
+            }
+        }
+        canvas.width = width; /*设置新的图片的宽度*/
+        canvas.height = height; /*设置新的图片的长度*/
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height); /*绘图*/
+        var dataURL = canvas.toDataURL("image/png", 1);
+        return dataURL.replace("data:image/png;base64,", "");
+    }
+
+    //删除图片
+    function deleteImg() {
+        if(imgArr.length > 0) {
+            imgUrls = imgArr.join(",");
+        } else {
+            return;
+        }
+        $.post(getContextPath() + "/app/deleteImg", {
+                imgUrls: imgUrls,
+            },
+            function(data) {
+                //失败
+                if(data.code == 0) {
+                    $.toast(data.msg, 'forbidden', 2000);
+                } else {
+                    imgArr = new Array();
+                    $('#img2x').html("");
+                    $.toast(data.msg);
+                }
+            });
+    }
+
+    //提交新处罚单信息
+    function saveCf(){
+        var jfCf = {};
+        jfCf.id = $("#cfId").val();		// 处罚单ID
+        jfCf.cfjf = $("#jf_ids").val();		// 处罚网元
+        var sedDate = $("#years-monthes").val();
+        jfCf.cfrq = new Date(sedDate);		// 日期
+        jfCf.cfdx = $("#cfdx_ids").val();		// 处罚对象
+        jfCf.cftd = $("#cftd_ids").val();		// 处罚梯度      //jfCf.cfqxyyz = $().val();		// 处罚权限拥有者
+        jfCf.cfyyms = $("#cfyyms").val();		// 处罚原因描述
+        jfCf.createBy= $("#user_id").val();		//处罚人
+        if(imgArr.length > 4) {
+            imgUrls = imgArr.join("|");//把‘|’拼接到图片路径后面
+            jfCf.cfxczp = imgUrls;
+        }/* else{
+         	alert("图片至少五张");
+       	return;
+         }  */
+        
+       	//说明只有一张或者没有图片
+    	if(imgUrls != "") {
+        jfCf.cfxczp = imgUrls;
+        }
+        
+        $.post(
+            getContextPath()+"/app/saveCfd",
+
+            jfCf,
+
+            function (data) {
+                if(data.code == 1) {
+                    $.toast(data.msg,'forbidden', 8000);
+                    window.location.href = "index1.html";
+                } else {
+                    $.toast(data.msg,'forbidden', 8000);
+                }
+            });
+    }
+</script>
+</html>

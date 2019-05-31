@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<meta charset="utf-8">
+<meta name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+<script src="../static/js/zepto.min.js"></script>
+<script src="../static/js/swipe.js"></script>
+<script src="../static/js/common.js"></script>
+<script src="../static/js/jquery.js"></script>
+<script src="../static/js/jquery-1.9.1.js"></script>
+<script src="../static/js/jquery-1.9.1.min.js"></script>
+<script src="../static/js/jquery.params.js"></script>
+</head>
+<body>
+<div style="width: 100%;align-content: center;text-align: center;">
+    <div id="ggWz" ></div>
+</div>
+<script type="text/javascript">
+    var test1 = location.search;
+    var strs = new Array();
+    strs = test1.split("\=");
+    $(function () {
+        var id = strs[1];
+        loadData(id);
+    });
+
+    function loadData(id) {
+
+        $.post(
+            "http://116.255.175.24:8888/jfxt/wxrest/ShowJfImg?id="+id,
+            {
+
+            },
+            function (data) {
+                if(data.code == 1) {
+                    //图片查询成功
+                    arr = data.data;
+                    var list_html = '<ul>';
+                        for (var i = 0; i <arr.length; i++) {
+                            var obj = arr[i];
+                            list_html +='<li><img style="width: 400px;height: 400px;" src="'+obj+'"/></li>'
+                        }
+                        list_html+='</ul>';
+                    $("#ggWz").html(list_html);
+                } else {
+                    $.toast(data.msg,'forbidden', 8000);
+                }
+            });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.merchant.dao.JfZgDao">
+    
+	<sql id="jfZgColumns">
+		a.id AS "id",
+		a.zgjf AS "zgjf.id",
+		a.zgdh AS "zgdh",
+		a.zgrq AS "zgrq",
+		a.zgyq AS "zgyq",
+		a.cfxczp AS "cfxczp",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.kzzd1 AS "kzzd1",
+		a.kzzd2 AS "kzzd2",
+		a.kzzd3 AS "kzzd3",
+		a.kzzd4 AS "kzzd4",
+		b.name as "zgjf.name",
+		a.is_Safety_Hazard AS "isSafetyHazard",
+		a.brief_Descri_ption AS "briefDescription",
+		a.reason AS "reason",
+		a.is_ODF AS "isODF",
+		a.is_Cut_Over AS "isCutOver",
+		a.is_Cut_Over_Content AS "isCutOverContent",
+		a.is_Optical_Cable AS "isOpticalCable",
+		a.optical_Cable_Cutting AS "opticalCableCutting",
+		a.optical_Cable_Content AS "opticalCableContent",
+		a.need_Remediation AS "needRemediation",
+		a.content_Description AS "contentDescription"
+		
+	</sql>
+	
+	<sql id="jfZgJoins">
+		left join jf_xx b on b.id=a.zgjf
+	</sql>
+    
+	<select id="get" resultType="JfZg">
+		SELECT 
+			<include refid="jfZgColumns"/>
+		FROM jf_zg a
+		<include refid="jfZgJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="JfZg">
+		SELECT 
+			<include refid="jfZgColumns"/>
+		FROM jf_zg a
+		<include refid="jfZgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="zgjf != null and zgjf.id != null and zgjf.id!= ''">
+				AND a.zgjf = #{zgjf.id}
+			</if>
+			<if test="zgdh != null and zgdh != ''">
+				AND a.zgdh LIKE 
+					<if test="dbName == 'oracle'">'%'||#{zgdh}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{zgdh}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{zgdh},'%')</if>
+			</if>
+			<if test="startDate != null and startDate != ''">
+				AND
+				DATE_FORMAT(a.zgrq, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
+			</if>
+			<if test="overDate != null and overDate != ''">
+				AND DATE_FORMAT(#{overDate}, '%Y-%m-%d') &gt;= DATE_FORMAT(a.zgrq, '%Y-%m-%d')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		<if test="limit != null and limit != ''">
+			limit ${limit},10
+		</if>
+	</select>
+	
+	<select id="findAllList" resultType="JfZg">
+		SELECT 
+			<include refid="jfZgColumns"/>
+		FROM jf_zg a
+		<include refid="jfZgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO jf_zg(
+			id,
+			zgjf,
+			zgdh,
+			zgrq,
+			zgyq,
+			cfxczp,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			kzzd1,
+			kzzd2,
+			kzzd3,
+			kzzd4,
+			is_Safety_Hazard,
+			brief_Descri_ption,
+			reason,
+			is_ODF,
+			is_Cut_Over,
+			is_Cut_Over_Content,
+			is_Optical_Cable,
+			optical_Cable_Cutting,
+			optical_Cable_Content,
+			need_Remediation,
+			content_Description
+			
+			
+		) VALUES (
+			#{id},
+			#{zgjf.id},
+			#{zgdh},
+			#{zgrq},
+			#{zgyq},
+			#{cfxczp},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{kzzd1},
+			#{kzzd2},
+			#{kzzd3},
+			#{kzzd4},
+			#{isSafetyHazard},
+			#{briefDescription},
+			#{reason},
+			#{isODF},
+			#{isCutOver},
+			#{isCutOverContent},
+			#{isOpticalCable},
+			#{opticalCableCutting},
+			#{opticalCableContent},
+			#{needRemediation},
+			#{contentDescription}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE jf_zg SET 	
+			zgjf = #{zgjf.id},
+			zgdh = #{zgdh},
+			zgrq = #{zgrq},
+			zgyq = #{zgyq},
+			cfxczp = #{cfxczp},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag},
+			kzzd1 = #{kzzd1},
+			kzzd2 = #{kzzd2},
+			kzzd3 = #{kzzd3},
+			kzzd4 = #{kzzd4},
+			is_Safety_Hazard = #{isSafetyHazard},
+			brief_Descri_ption = #{briefDescription},
+			reason = #{reason},
+			is_ODF = #{isODF},
+			is_Cut_Over = #{isCutOver},
+			is_Cut_Over_Content = #{isCutOverContent},
+			is_Optical_Cable = #{isOpticalCable},
+			optical_Cable_Cutting = #{opticalCableCutting},
+			optical_Cable_Content = #{opticalCableContent},
+			need_Remediation = #{needRemediation},
+			content_Description = #{contentDescription}
+			
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE jf_zg SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

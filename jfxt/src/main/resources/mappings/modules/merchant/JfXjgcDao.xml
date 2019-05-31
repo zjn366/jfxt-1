@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.merchant.dao.JfXjgcDao">
+    
+	<sql id="jfXjgcColumns">
+		a.id AS "id",
+		a.xjjf AS "xjjf.id",
+		a.xjsj AS "xjsj",
+		a.xjry AS "xjry.id",
+		a.xczp AS "xczp",
+		a.zgpd AS "zgpd",
+		a.xjsftg AS "xjsftg",
+		a.xjdf AS "xjdf",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.kzzd1 AS "kzzd1",
+		a.kzzd2 AS "kzzd2",
+		a.kzzd3 AS "kzzd3",
+		a.kzzd4 AS "kzzd4",
+		b.name as "xjjf.name",
+		c.name as "xjry.name"
+	</sql>
+	
+	<sql id="jfXjgcJoins">
+		left join jf_xx b on b.id=a.xjjf
+		left join sys_user c on c.id=a.xjry
+	</sql>
+    
+	<select id="get" resultType="JfXjgc">
+		SELECT 
+			<include refid="jfXjgcColumns"/>
+		FROM jf_xjgc a
+		<include refid="jfXjgcJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="JfXjgc">
+		SELECT 
+			<include refid="jfXjgcColumns"/>
+		FROM jf_xjgc a
+		<include refid="jfXjgcJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="xjjf != null and xjjf.id != null and xjjf.id!= ''">
+				AND a.xjjf = #{xjjf.id}
+			</if>
+			<if test="startDate != null and startDate != ''">
+				AND
+				DATE_FORMAT(a.xjsj, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
+			</if>
+			<if test="overDate != null and overDate != ''">
+				AND DATE_FORMAT(#{overDate}, '%Y-%m-%d') &gt;= DATE_FORMAT(a.xjsj, '%Y-%m-%d')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		<if test="limit != null and limit != ''">
+			limit ${limit},10
+		</if>
+	</select>
+	
+	<select id="findAllList" resultType="JfXjgc">
+		SELECT 
+			<include refid="jfXjgcColumns"/>
+		FROM jf_xjgc a
+		<include refid="jfXjgcJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO jf_xjgc(
+			id,
+			xjjf,
+			xjsj,
+			xjry,
+			xczp,
+			zgpd,
+			xjsftg,
+			xjdf,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			kzzd1,
+			kzzd2,
+			kzzd3,
+			kzzd4
+		) VALUES (
+			#{id},
+			#{xjjf.id},
+			#{xjsj},
+			#{xjry.id},
+			#{xczp},
+			#{zgpd},
+			#{xjsftg},
+			#{xjdf},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{kzzd1},
+			#{kzzd2},
+			#{kzzd3},
+			#{kzzd4}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE jf_xjgc SET 	
+			xjjf = #{xjjf.id},
+			xjsj = #{xjsj},
+			xjry = #{xjry.id},
+			xczp = #{xczp},
+			zgpd = #{zgpd},
+			xjsftg = #{xjsftg},
+			xjdf = #{xjdf},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag},
+			kzzd1 = #{kzzd1},
+			kzzd2 = #{kzzd2},
+			kzzd3 = #{kzzd3},
+			kzzd4 = #{kzzd4}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE jf_xjgc SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

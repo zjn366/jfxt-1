@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>巡检结果</title>
+    <link rel="stylesheet" href="css/weui.min.css">
+    <link rel="stylesheet" href="css/jquery-weui.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <link rel="stylesheet" href="css/icon.css">
+    <script src="js/zepto.min.js"></script>
+    <script src="js/swipe.js"></script>
+    <script src="html5plus://ready"></script>
+    <script src="js/common.js"></script>
+        <script src="js/jquery-2.1.4.js"></script>
+   <script src="js/fastclick.js"></script>
+</head>
+<body ontouchstart>
+
+<div class="weui_btn_primary weui-header ">
+    <div class="weui-header-left" id="back"></div>
+    <h1 class="weui-header-title">巡检结果</h1>
+</div>
+
+<div class="kong2"></div>
+<div class="weui-cells__title">网元</div>
+<div class="weui-cells weui-cells_radio">
+    <label class="weui-cell weui-check__label" for="x11">
+        <input id="jf_xx_id" value="" style="display: none">
+        <div class="weui-cell__bd" id="jf_xx">
+
+        </div>
+        <div class="weui-cell__ft">
+            <input type="radio" class="weui-check" name="radio1" id="x11" checked="checked">
+            <span class="weui-icon-checked"></span>
+        </div>
+    </label>
+</div>
+<div class="weui-cells__title">巡检人</div>
+<div class="weui-cells weui-cells_radio">
+    <label class="weui-cell weui-check__label" for="x12">
+        <input id="user_id" value="" style="display: none">
+        <div class="weui-cell__bd" id="user_name">
+        </div>
+        <div class="weui-cell__ft">
+            <input type="radio" class="weui-check" name="radio2" id="x12" checked="checked">
+            <span class="weui-icon-checked"></span>
+        </div>
+    </label>
+</div>
+<!--<img src="http://192.168.1.32:8080/jfxt/userfiles/1/images/app/xjxcimg/1555549501189.jpg" id="camaro" style="width: 100%;height: 200px;"/>-->
+<div class="weui-cells__title">整改结果</div>
+<div class="weui-cells" id="messages">
+    <div class="weui-cell weui-cell_select">
+        <div class="weui-cell__bd" >
+            <input id="zgjg" value="0" style="display: none">
+            <select class="weui-select" name="select1" onchange="se(this,'messages')">
+            	<option value="0">请选择是否整改</option>
+                <option value="1">整改</option>
+                <option value="2">不整改</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="weui-cells__title">整改判断</div>
+<div class="weui-cells">
+    <div class="weui-cell weui-cell_select">
+        <textarea id="zgpd" name="textfield3" cols="100%" rows="6" placeholder="请填写巡检判断！"></textarea>
+    </div>
+</div>
+<div class="weui-cells">
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">打分</label></div>
+        <div class="weui-cell__bd">
+                <div class="weui-rater">
+                    <a data-num = "0" class="weui-rater-box checked"> <span class="weui-rater-inner">★</span> </a>
+                    <a data-num = "1" class="weui-rater-box"> <span class="weui-rater-inner">★</span> </a>
+                    <a data-num = "2" class="weui-rater-box"> <span class="weui-rater-inner">★</span> </a>
+                    <a data-num = "3" class="weui-rater-box"> <span class="weui-rater-inner">★</span> </a>
+                    <a data-num = "4" class="weui-rater-box"> <span class="weui-rater-inner">★</span> </a>
+                </div>
+            <div id='fen' class="weui_cells_title" style="display: none"></div>
+        </div>
+    </div>
+</div>
+<div class="weui-gallery" id="gallery">
+    <span class="weui-gallery__img" id="galleryImg"></span>
+</div>
+<div class="weui-cells__title sczp">上传现场照片</div>
+<div class="weui-cells sczp">
+    <div class="weui-uploader__bd">
+        <ul class="weui-uploader__files" id="img2x">
+        </ul>
+        <div class="weui-uploader__input-box">
+            <form id="uploadImgForm">
+                <div id="img">
+                    <div class="weui-uploader__input" type="file" id="imgFile" name="imgFile" accept="image/jpg,image/jpeg,image/png,image/gif" multiple></div>
+                </div>
+            </form>
+        </div>
+    </div>
+     <input type="button" value="清空图片" onclick="deleteImg()"/>
+</div>
+<!--<div class="weui-cells__title zhenggai" >整改单</div>-->
+<div class="weui-cells zhenggai">
+    <div class="weui-cell">
+        <a href="#" class="weui-btn weui-btn_primary" id="txzgd">填写整改单</a>
+    </div>
+</div>
+<div class="weui-cells tijiao">
+    <div class="weui-cell">
+        <a href="#" onclick="saveXj()"  class="weui-btn weui-btn_primary" >提交</a>
+    </div>
+</div>
+</body>
+<script src="js/jquery-2.1.4.js"></script>
+<script src="js/jquery-weui.js"></script>
+<script type="text/javascript">
+    // $(function(){
+    //     var tmpl = '<li class="weui-uploader__file" style="background-image:url(#url#)"></li>',
+    //         $gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
+    //         $uploaderInput = $("#uploaderInput"),
+    //         $uploaderFiles = $("#uploaderFiles");
+    //
+    //     $uploaderInput.on("change", function(e){
+    //         var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
+    //         for (var i = 0, len = files.length; i < len; ++i) {
+    //             var file = files[i];
+    //
+    //             if (url) {
+    //                 src = url.createObjectURL(file);
+    //             } else {
+    //                 src = e.target.result;
+    //             }
+    //
+    //             $uploaderFiles.append($(tmpl.replace('#url#', src)));
+    //         }
+    //     });
+    //     $uploaderFiles.on("click", "li", function(){
+    //         $galleryImg.attr("style", this.getAttribute("style"));
+    //         $gallery.fadeIn(100);
+    //     });
+    //     $gallery.on("click", function(){
+    //         $gallery.fadeOut(100);
+    //     });
+    // });
+</script>
+<script>
+    $(function(){
+        $('.weui-number-plus').click(function(){
+            upDownOperation( $(this) );
+        });
+        $('.weui-number-sub').click(function(){
+            upDownOperation( $(this) );
+        });
+
+        //评分js
+        var arr = ["1","2","3","4","5"];
+        var num = -1;
+        $(".weui-rater a").mouseover(function(){
+            var thisL = $(this).index();
+            for(var i = 0;i < thisL;i++){
+                $(".weui-rater a").eq(i).addClass('checked');
+            }
+            for(var i = thisL; i < 5;i++){
+                $(".weui-rater a").eq(i).removeClass('checked');
+            }
+            $(this).addClass('checked');
+        })
+        $(".weui-rater a").mouseout(function(){
+            var thisL = $(this).index();
+            for(var i = thisL; i < 5;i++){
+                $(".weui-rater a").eq(i).removeClass('checked');
+            }
+        })
+        $(".weui-rater").mouseout(function(){
+
+            for(var i = 0; i < num;i++){
+                $(".weui-rater a").eq(i).addClass('checked');
+            }
+        })
+        $(".weui-rater a").click(function(){
+            var thisL = $(this).index();
+            $("#fen").html(arr[thisL]);
+            $(this).addClass('checked');
+            num = thisL+1;
+            $("#fenshu").val(num);
+            console.log(num);
+        })
+
+    });
+</script>
+<script type="text/javascript">
+    var id = GetArgsFromHref("ggid");
+    $(function(){
+        var back_html = '';
+        back_html += '<a href="ggxq.html?ggid='+id+'" class="icon icon-109 f-white"></a>'
+        $("#back").html(back_html);
+        //获取存储在本地的会员Id
+        var storage=window.localStorage;
+        var userId = storage.getItem("loginName");
+         $('.zhenggai').css('display','none');
+         $('.sczp').css('display','none');
+         $('.tijiao').css('display','block');
+        findUser(userId);
+        findGg(id);
+    });
+
+//打开新窗口填写整改单
+
+        $("#txzgd").click(function(){
+        	//保存已有的巡检过程
+        	    var b =$("#zgjg").val();
+			       if(b=='2'){
+			       	alert("请选择整改结果");
+			       	return;
+			       }
+			       
+			        var jfXjgc = {};
+			        jfXjgc.xjjf =  $("#jf_xx_id").val();
+			        jfXjgc.xjsj =  new Date();
+			        jfXjgc.xjry =  $("#user_id").val();
+			        jfXjgc.zgpd =  $("#zgpd").val();
+			        jfXjgc.xjsftg = b;
+			        jfXjgc.xjdf =  $("#fen").text();
+			        jfXjgc.xjjf =  $("#jf_xx_id").val();
+			   		
+			        $.post(
+			            getContextPath()+"/app/saveXj",
+			
+			            jfXjgc,
+			
+			            function (data) {
+			                if(data.code == 1) {
+			                	$.toast(data.msg,'forbidden', 8000);
+			                    	var url = "newzgd.html?ggid="+id+"&&xunjianid="+data.data.id;
+         							window.open(url);
+			                } else {
+			                    $.toast(data.msg,'forbidden', 8000);
+			                }
+			            });
+        });
+
+    //查询登录用户
+    function findUser(userId){
+        $.post(
+            getContextPath()+"/app/findUser",
+            {
+                "id": userId
+            },
+            function (data) {
+                if(data.code == 1) {
+                    var obj = data.data;
+                    $("#user_name").text(obj.name);
+                    $("#user_id").val(obj.id);
+                } else {
+                    $.toast(data.msg,'forbidden', 8000);
+                }
+            });
+    }
+
+    //查询公告以及对应网元
+    function findGg(id){
+        $.post(
+            getContextPath()+"/app/findJfbygg",
+            {
+                "id": id
+            },
+            function (data) {
+                if(data.code == 1) {
+                    var obj = data.data;
+                    $("#jf_xx").text(obj.name);
+                    $("#jf_xx_id").val(obj.id);
+                } else {
+                    $.toast(data.msg,'forbidden', 8000);
+                }
+            });
+    };
+
+      //显隐整改单  
+//     $('.sczp').css('display','none');
+       function se(el,dx){
+           var a =( $(el).find("option:selected").text());
+           // var m= $(el).parents('#'+dx);
+           if(a == '整改'){
+               $('.zhenggai').css('display','block');
+               $('.sczp').css('display','none');
+               $("#zgjg").val("0");
+               $('.tijiao').css('display','none');
+           }
+           if(a == '不整改'){
+               $('.zhenggai').css('display','none');
+               $('.sczp').css('display','block');
+               $("#zgjg").val("1");
+               $('.tijiao').css('display','block');
+           }
+           if(a == '请选择是否整改'){
+               $('.zhenggai').css('display','none');
+               $('.sczp').css('display','none');
+               $("#zgjg").val("2");
+               $('.tijiao').css('display','block');
+           }
+       };
+
+    var imgArr = new Array(); //保存多图片路径
+    var imgUrls = "";
+
+    if(window.plus) {
+        plusReady();
+    } else {
+        document.addEventListener("plusready", plusReady, false);
+    }
+    // 扩展API准备完成后要执行的操作
+    function plusReady() {
+        var ws = plus.webview.currentWebview();
+        //pw回车可输出plus.webview // ... code
+    }
+
+    //点击事件，弹出选择摄像头和相册的选项
+    $("#imgFile").click(
+        function showActionSheet() {
+            var bts = [{
+                title: "拍照"
+            }, {
+                title: "从相册选择"
+            }];
+
+            plus.nativeUI.actionSheet({
+                    cancel: "取消",
+                    buttons: bts
+                },
+                function(e) {
+                    if(e.index == 1) {
+                        getImage();
+                    } else if(e.index == 2) {
+                        galleryImgs();
+                    }
+                }
+            );
+        }
+    );
+
+    //调用相机拍照
+    function getImage() {
+        var cmr = plus.camera.getCamera();
+        cmr.captureImage(function(p) {
+            plus.io.resolveLocalFileSystemURL(p, function(entry) {
+                //转为base64并提交到后台
+                uploadImg(entry.toLocalURL());
+                //compressImage(entry.toLocalURL(),entry.name);
+            }, function(e) {
+                alert();
+                plus.nativeUI.toast("读取拍照文件错误：" + e.message);
+            });
+        }, function(e) {}, {
+            filter: 'image'
+        });
+    }
+    //从相册选择照片
+    function galleryImgs() {
+        plus.gallery.pick(function(p) {
+            plus.io.resolveLocalFileSystemURL(p, function(entry) {
+                //转为base64并提交到后台
+                uploadImg(entry.toLocalURL());
+                //compressImage(entry.toLocalURL(),entry.name);
+            }, function(e) {
+                plus.nativeUI.toast("读取拍照文件错误：" + e.message);
+            });
+        }, function(e) {}, {
+            filename: "_doc/camera/",
+            filter: "image"
+        });
+
+    }
+
+    //图片上传
+    function uploadImg(imgPath) {
+        var image = new Image();
+        image.onload = function() {
+            var imgData = getBase64Image(image);
+            var formData = new FormData($("#uploadImgForm")[0]);
+            $.post(
+                getContextPath() + "/app/uploadImg", {
+                    "imgData": imgData,
+                },
+                function(data) {
+                    if(data.code == 1) {
+                        var obj = data.data;
+                        imgArr.push(obj);
+                        $('#img2x').append('<img src="'+ getFilePath() + obj +'" style="width: 100px;height: 80px;margin-left:15px;"/>');
+                        //$('#img2x').append('<li class="weui-uploader__input-box" style="background-image:url(' + getFilePath() + obj + ')">');
+                    } else {
+                        alert(data.msg);
+                    }
+
+                });
+        }
+        image.src = imgPath;
+        image.style.width = "60px";
+        image.style.height = "60px";
+    }
+
+    //将图片压缩转成base64
+    function getBase64Image(img) {
+
+        var canvas = document.createElement("canvas");
+        var width = img.width;
+        var height = img.height;
+
+        if(width > height) {
+            if(width > 100) {
+                height = Math.round(height *= 800 / width);
+                width = 400;
+            }
+        } else {
+            if(height > 100) {
+                width = Math.round(width *= 800 / height);
+                height = 400;
+            }
+        }
+        canvas.width = width; /*设置新的图片的宽度*/
+        canvas.height = height; /*设置新的图片的长度*/
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height); /*绘图*/
+        var dataURL = canvas.toDataURL("image/png", 1);
+        return dataURL.replace("data:image/png;base64,", "");
+    }
+
+
+    //删除图片
+    function deleteImg() {
+        if(imgArr.length > 0) {
+            imgUrls = imgArr.join(",");
+        } else {
+            return;
+        }
+        $.post(getContextPath() + "/app/deleteImg", {
+                imgUrls: imgUrls,
+            },
+            function(data) {
+                //失败
+                if(data.code == 0) {
+                    $.toast(data.msg, 'forbidden', 2000);
+                } else {
+                    imgArr = new Array();
+                    $('#img2x').html("");
+                    $.toast(data.msg);
+                }
+            });
+    }
+    
+    
+    
+    //保存巡检结果
+    function saveXj(){
+    	
+     var b =$("#zgjg").val();
+       if(b=='2'){
+       	alert("请选择整改结果");
+       	return;
+       }
+       
+       
+        var jfXjgc = {};
+        jfXjgc.xjjf =  $("#jf_xx_id").val();
+        jfXjgc.xjsj =  new Date();
+        jfXjgc.xjry =  $("#user_id").val();
+        jfXjgc.zgpd =  $("#zgpd").val();
+        jfXjgc.xjsftg = b;
+        jfXjgc.xjdf =  $("#fen").text();
+        jfXjgc.xjjf =  $("#jf_xx_id").val();
+         if(imgArr.length > 4) {
+             imgUrls = imgArr.join("|");
+             jfXjgc.xczp = imgUrls;
+         }else{
+         	alert("图片至少五张");
+       	return;
+         }
+        if(imgUrls != "") {
+            jfXjgc.xczp = imgUrls;
+        }
+        
+        
+        $.post(
+            getContextPath()+"/app/saveXj",
+
+            jfXjgc,
+
+            function (data) {
+                if(data.code == 1) {
+                    $.toast(data.msg,'forbidden', 8000);
+                    window.location.href = "index1.html";
+                } else {
+                    $.toast(data.msg,'forbidden', 8000);
+                }
+            });
+    }
+</script>
+</html>

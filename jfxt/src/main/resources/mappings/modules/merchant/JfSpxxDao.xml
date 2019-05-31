@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.merchant.dao.JfSpxxDao">
+    
+	<sql id="jfSpxxColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.cpbh AS "cpbh",
+		a.cpxh AS "cpxh",
+		a.cpzl AS "cpzl",
+		a.cpgys AS "cpgys",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.kzzd1 AS "kzzd1",
+		a.kzzd2 AS "kzzd2",
+		a.kzzd3 AS "kzzd3",
+		a.kzzd4 AS "kzzd4",
+		a.cpcbj AS "cpcbj",
+		a.cpsjsx AS "cpsjsx",
+		a.cpsjxx AS "cpsjxx",
+		a.cpzk AS "cpzk",
+		a.cpkcl AS "cpkcl",
+		a.cpyxq AS "cpyxq",
+		a.cpjggxsj AS "cpjggxsj",
+		a.cpsl AS "cpsl"
+	</sql>
+	
+	<sql id="jfSpxxJoins">
+	</sql>
+    
+	<select id="get" resultType="JfSpxx">
+		SELECT 
+			<include refid="jfSpxxColumns"/>
+		FROM jf_spxx a
+		<include refid="jfSpxxJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="JfSpxx">
+		SELECT 
+			<include refid="jfSpxxColumns"/>
+		FROM jf_spxx a
+		<include refid="jfSpxxJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="cpbh != null and cpbh != ''">
+				AND a.cpbh = #{cpbh}
+			</if>
+			<if test="cpxh != null and cpxh != ''">
+				AND a.cpxh = #{cpxh}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		<if test="limit != null and limit != ''">
+			limit ${limit},10
+		</if>
+	</select>
+	
+	<select id="findAllList" resultType="JfSpxx">
+		SELECT 
+			<include refid="jfSpxxColumns"/>
+		FROM jf_spxx a
+		<include refid="jfSpxxJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO jf_spxx(
+			id,
+			name,
+			cpbh,
+			cpxh,
+			cpzl,
+			cpgys,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			kzzd1,
+			kzzd2,
+			kzzd3,
+			kzzd4,
+			cpcbj,
+			cpsjsx,
+			cpsjxx,
+			cpzk,
+			cpkcl,
+			cpyxq,
+			cpjggxsj,
+			cpsl
+		) VALUES (
+			#{id},
+			#{name},
+			#{cpbh},
+			#{cpxh},
+			#{cpzl},
+			#{cpgys},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{kzzd1},
+			#{kzzd2},
+			#{kzzd3},
+			#{kzzd4},
+			#{cpcbj},
+			#{cpsjsx},
+			#{cpsjxx},
+			#{cpzk},
+			#{cpkcl},
+			#{cpyxq},
+			#{cpjggxsj},
+			#{cpsl}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE jf_spxx SET 	
+			name = #{name},
+			cpbh = #{cpbh},
+			cpxh = #{cpxh},
+			cpzl = #{cpzl},
+			cpgys = #{cpgys},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag},
+			kzzd1 = #{kzzd1},
+			kzzd2 = #{kzzd2},
+			kzzd3 = #{kzzd3},
+			kzzd4 = #{kzzd4},
+			cpcbj = #{cpcbj},
+			cpsjsx = #{cpsjsx},
+			cpsjxx = #{cpsjxx},
+			cpzk = #{cpzk},
+			cpkcl = #{cpkcl},
+			cpyxq = #{cpyxq},
+			cpjggxsj = #{cpjggxsj},
+			cpsl = #{cpsl}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE jf_spxx SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.merchant.dao.JfXjggDao">
+    
+	<sql id="jfXjggColumns">
+		a.id AS "id",
+		a.ggbt AS "ggbt",
+		a.ggnr AS "ggnr",
+		a.jfid AS "jfid.id",
+		a.fbrq AS "fbrq",
+		a.fbr AS "fbr.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.kzzd1 AS "kzzd1",
+		a.kzzd2 AS "kzzd2",
+		a.kzzd3 AS "kzzd3",
+		a.kzzd4 AS "kzzd4",
+		a.sffb AS "sffb",
+		b.name as "fbr.name",
+		c.name as "jfid.name"
+	</sql>
+	
+	<sql id="jfXjggJoins">
+        left join jf_xx c on c.id=a.jfid
+		left join sys_user b on b.id=a.fbr
+	</sql>
+    
+	<select id="get" resultType="JfXjgg">
+		SELECT 
+			<include refid="jfXjggColumns"/>
+		FROM jf_xjgg a
+		<include refid="jfXjggJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="JfXjgg">
+		SELECT 
+			<include refid="jfXjggColumns"/>
+		FROM jf_xjgg a
+		<include refid="jfXjggJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="ggbt != null and ggbt != ''">
+				AND a.ggbt LIKE 
+					<if test="dbName == 'oracle'">'%'||#{ggbt}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{ggbt}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{ggbt},'%')</if>
+			</if>
+			<if test="jfid != null and jfid.id != ''and jfid.id != null">
+				AND a.jfid = #{jfid.id}
+			</if>
+			<if test="sffb != null and sffb != ''">
+				AND a.sffb = #{sffb}
+			</if>
+			<if test="fbrq != null and fbrq != ''">
+				AND
+				DATE_FORMAT(a.fbrq, '%Y-%m-%d') &gt;= DATE_FORMAT(#{fbrq}, '%Y-%m-%d')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		<if test="limit != null and limit != ''">
+			limit ${limit},10
+		</if>
+	</select>
+	
+	<select id="findAllList" resultType="JfXjgg">
+		SELECT 
+			<include refid="jfXjggColumns"/>
+		FROM jf_xjgg a
+		<include refid="jfXjggJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO jf_xjgg(
+			id,
+			ggbt,
+			ggnr,
+			jfid,
+			fbrq,
+			fbr,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			kzzd1,
+			kzzd2,
+			kzzd3,
+			kzzd4,
+			sffb
+		) VALUES (
+			#{id},
+			#{ggbt},
+			#{ggnr},
+			#{jfid.id},
+			#{fbrq},
+			#{fbr.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{kzzd1},
+			#{kzzd2},
+			#{kzzd3},
+			#{kzzd4},
+			#{sffb}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE jf_xjgg SET 	
+			ggbt = #{ggbt},
+			ggnr = #{ggnr},
+			jfid = #{jfid.id},
+			fbrq = #{fbrq},
+			fbr = #{fbr.id},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag},
+			kzzd1 = #{kzzd1},
+			kzzd2 = #{kzzd2},
+			kzzd3 = #{kzzd3},
+			kzzd4 = #{kzzd4},
+			sffb = #{sffb}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE jf_xjgg SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!--最新公告_已发布的 -->
+	<select id="findListZx" resultType="JfXjgg">
+		SELECT
+		<include refid="jfXjggColumns"/>
+		FROM jf_xjgg a
+		<include refid="jfXjggJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="ggbt != null and ggbt != ''">
+				AND a.ggbt LIKE
+				<if test="dbName == 'oracle'">'%'||#{ggbt}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ggbt}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ggbt},'%')</if>
+			</if>
+			<if test="jfid != null and jfid != ''">
+				AND a.jfid = #{jfid}
+			</if>
+			<if test="sffb != null and sffb != ''">
+				AND a.sffb = #{sffb}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		limit 5
+	</select>
+</mapper>

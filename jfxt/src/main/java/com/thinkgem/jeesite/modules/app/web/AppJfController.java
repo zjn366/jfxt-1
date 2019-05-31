@@ -1,0 +1,509 @@
+package com.thinkgem.jeesite.modules.app.web;
+
+
+
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.filemanage.FileUpload;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.modules.app.util.AppResult;
+import com.thinkgem.jeesite.modules.merchant.entity.*;
+import com.thinkgem.jeesite.modules.merchant.service.*;
+import com.thinkgem.jeesite.modules.sys.entity.Dict;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.service.DictService;
+import com.thinkgem.jeesite.modules.sys.service.SystemService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Decoder;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.*;
+
+/**
+ * @author App管理
+ * @Title: ${file_name}
+ * @Package ${package_name}
+ * @Description: ${todo}
+ * @date 2018-05-2815:49
+ */
+@Controller
+@RequestMapping(value = "/app")
+public class AppJfController {
+    @Autowired
+    private JfXjggService jfXjggService;
+    @Autowired
+    private JfXxService jfXxService;
+    @Autowired
+    private JfXjgcService jfXjgcService;
+    @Autowired
+    private SystemService systemService;
+    @Autowired
+    private JfCfService jfCfService;
+    @Autowired
+    private DictService dictService;
+    @Autowired
+    private JfZgService jfZgService;
+
+    /**
+     * 保存整改单过程
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/saveZgd")
+    @ResponseBody
+    public Object saveZgd(HttpServletResponse response,JfZg jfZg){
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            if (jfZg.getId()==null|| jfZg.getId()==""){//新整改单
+                String tzd=""+new Date().getTime();
+                jfZg.setZgdh(tzd);//生成新的单号
+            }
+            if (jfZg.getKzzd1()!=null){
+                String xjId=jfZg.getKzzd1();
+                //查询巡检单进行状态修改以及照片添加
+                JfXjgc jfXjgc=jfXjgcService.get(xjId);
+                jfXjgc.setXczp(jfZg.getCfxczp());//照片
+                jfXjgc.setDelFlag("0");
+                jfXjgcService.save(jfXjgc);
+            }
+            //保存整改单
+            jfZgService.save(jfZg);
+            return AppResult.writeResultRep(jfZg,"保存处罚单成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("保存处罚单失败");
+        }
+    }
+
+
+    /**
+     * 保存处罚单过程
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/saveCfd")
+    @ResponseBody
+    public Object saveCfd(HttpServletResponse response,JfCf jfCf){
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+
+            if (jfCf.getId()==null|| jfCf.getId()==""){//新处罚单
+                String tzd=""+new Date().getTime();
+                jfCf.setCftzd(tzd);//生成新的单号
+            }
+
+            jfCfService.save(jfCf);
+            return AppResult.writeResultRep(jfCf,"保存处罚单成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("保存处罚单失败");
+        }
+    }
+
+
+
+    /**
+     * 字典列表
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/cfZdList")
+    @ResponseBody
+    public Object cfZdList(HttpServletResponse response,Dict dict) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+                List<Dict> dicts=dictService.findList(dict);
+                return AppResult.writeResultRep(dicts, "获取字典列表成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("获取字典列表失败");
+        }
+    }
+
+
+
+    /**
+     * 网元列表
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/jfList")
+    @ResponseBody
+    public Object jfList(HttpServletResponse response, JfXx jfXx) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            List<JfXx> jfXxs = jfXxService.findList(jfXx);
+            return AppResult.writeResultRep(jfXxs, "获取网元列表成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("获取网元列表失败");
+        }
+    }
+
+
+    /**
+     * 整改单详情
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/zgDetail")
+    @ResponseBody
+    public Object zgDetail(HttpServletResponse response,String id) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            JfZg zgDetail = jfZgService.get(id);
+            return AppResult.writeResultRep(zgDetail, "返回处罚单详情成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("返回处罚单详情失败");
+        }
+    }
+
+    /**
+     * 处罚单详情
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/cfDetail")
+    @ResponseBody
+    public Object cfDetail(HttpServletResponse response,String id) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            JfCf cfDetail = jfCfService.get(id);
+            return AppResult.writeResultRep(cfDetail, "返回处罚单详情成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("返回处罚单详情失败");
+        }
+    }
+    /**
+     * 处罚单列表
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/cfList")
+    @ResponseBody
+    public Object cfList(HttpServletResponse response,HttpServletRequest request , JfCf jfCf) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            Page<JfCf> page = jfCfService.findPage(new Page<JfCf>(request, response), jfCf);
+            List<JfCf> jfCfs = page.getList();
+            return AppResult.writeResultRep(jfCfs, "获取处罚单列表失败");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("获取处罚单列表失败");
+        }
+    }
+
+    /**
+     * 整改单列表
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/zgList")
+    @ResponseBody
+    public Object zgList(HttpServletResponse response,HttpServletRequest request , JfZg jfZg) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+
+            List<JfZg> jfZgs = jfZgService.findList(jfZg);
+            return AppResult.writeResultRep(jfZgs, "获取处罚单列表失败");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("获取处罚单列表失败");
+        }
+    }
+
+    /**
+     * 保存巡检过程
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/saveXj")
+    @ResponseBody
+    public Object saveXj(HttpServletResponse response,JfXjgc jfXjgc){
+              response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+
+            if (jfXjgc.getXjsftg().equals("0")){
+                //说明是需要整改，先判断为无效，整改单保存后修改有效，存储照片
+                jfXjgc.setDelFlag("1");
+            }else if (jfXjgc.getXjsftg().equals("1")){
+                //不需要整改，直接保存巡检单
+                jfXjgc.setDelFlag("0");
+            }
+
+            jfXjgcService.save(jfXjgc);
+            return AppResult.writeResultRep(jfXjgc,"保存巡检过程成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("保存巡检过程失败");
+        }
+    }
+
+    /**
+     * 通过公告ID查询网元信息
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/findJfbygg")
+    @ResponseBody
+    public Object findJfbygg(HttpServletResponse response,String id) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+             //通过公告ID查询网元信息
+             JfXjgg jfXjg = jfXjggService.get(id);
+             JfXx JfXx = jfXxService.get(jfXjg.getJfid());
+             return AppResult.writeResultRep(JfXx, "获取网元信息成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("获取网元信息失败");
+        }
+    }
+
+    
+    /**
+     * 通过巡检ID查询网元信息
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/findJfInfo")
+    @ResponseBody
+    public Object findJfInfo(HttpServletResponse response,String id) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+             //通过巡检ID查询网元信息
+             JfXjgc jfXjc = jfXjgcService.get(id);
+             JfXx JfXx = jfXxService.get(jfXjc.getXjjf());
+             return AppResult.writeResultRep(JfXx, "获取网元信息成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("获取网元信息失败");
+        }
+    }
+    
+
+    /**
+     * 公告列表
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/ggList")
+    @ResponseBody
+    public Object ggList(HttpServletResponse response,JfXjgg jfXjgg) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            List<JfXjgg> jfXjggs = jfXjggService.findList(jfXjgg);
+            return AppResult.writeResultRep(jfXjggs, "获取公告列表成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("获取公告列表失败");
+        }
+    }
+
+    /**
+     * 最新公告查询
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/newggList")
+    @ResponseBody
+    public Object newggList(HttpServletResponse response,JfXjgg jfXjgg) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        jfXjgg.setFbrq(new Date());
+        try {
+            List<JfXjgg> jfXjggs = jfXjggService.findList(jfXjgg);
+            return AppResult.writeResultRep(jfXjggs, "获取公告列表成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("获取公告列表失败");
+        }
+    }
+
+    /**
+     * 查询用户
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/findUser")
+    @ResponseBody
+    public Object findUser(HttpServletResponse response,String id) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            User appUser = systemService.getUser(id);
+            return AppResult.writeResultRep(appUser, "返回公告详情成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("返回公告详情失败");
+        }
+    }
+
+
+    /**
+     * 公告详情
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping("/ggDetail")
+    @ResponseBody
+    public Object ggDetail(HttpServletResponse response,String id) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            JfXjgg ggDetail = jfXjggService.get(id);
+            return AppResult.writeResultRep(ggDetail, "返回公告详情成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("返回公告详情失败");
+        }
+    }
+
+    /**
+     * 登录
+     *
+     * @param loginName  password
+     * @return
+     */
+    @RequestMapping("/toLogin")
+    @ResponseBody
+    public Object toLogin(HttpServletResponse response,HttpServletResponse request,User user,String loginName, String password) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            user.setLoginName(loginName);
+            user.setMobilePassword(password);
+            User user1 = systemService.findUserApp(user);
+            return AppResult.writeResultRep(user1,"登录成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("登录失败");
+        }
+    }
+
+
+
+
+    /**
+     * 图片文件上传
+     *
+     * @param request
+     * @param imgFile
+     * @return
+     */
+    @RequestMapping(value = "/uploadImgFile", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @ResponseBody
+    public Object uploadImgFile(HttpServletRequest request,HttpServletResponse response,@RequestParam("imgFile") MultipartFile imgFile) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            String filePath  ="/userfiles/1/images/app/zqsj";
+            filePath = FileUpload.upload(request, filePath, imgFile);
+            System.out.println(filePath);
+            return AppResult.writeResultRep(filePath, "文件上传成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("文件上传失败");
+        }
+    }
+
+    /**
+     * 删除上传图片
+     *
+     * @param request
+     * @param imgUrls
+     * @return
+     */
+    @RequestMapping(value = "/deleteImg")
+    @ResponseBody
+    public Object deleteImg(HttpServletRequest request,HttpServletResponse response, String imgUrls) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            String[] imgArr = imgUrls.split(",");
+            for (int i = 0; i < imgArr.length; i++) {
+
+                String imgUrl = imgArr[i].replace("/crossfire", "");
+                String path = request.getSession().getServletContext().getRealPath(imgUrl);
+                File file = new File(path);
+                file.delete();
+            }
+
+            return AppResult.writeResultRep("", "图片删除成功");
+        } catch (Exception e) {
+            return AppResult.writeResultFailure("图片删除失败");
+        }
+    }
+    /**
+     * 图片上传
+     * @param response
+     * @param imgData
+     * @return
+     */
+    @RequestMapping("/uploadImg")
+    @ResponseBody
+    public Object uploadImg(HttpServletResponse response,String imgData){
+
+        try {
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            //String destPath = request.getSession().getServletContext().getRealPath("");
+            String destPath="";
+            String returnPath="";
+            returnPath = "/userfiles/1/images/app/xjxcimg/";
+            destPath = Global.getUserfilesBaseDir() + returnPath;
+            File dirFile = new File(destPath);
+            if (!dirFile.exists()) {    //创建文件夹
+                dirFile.mkdirs();
+            }
+            //生成jpeg图片
+            Date date = new Date();
+            //SimpleDateFormat formatter = new SimpleDateFormat("MMddHHmmss");
+            //String dateString = formatter.format(formatter);
+            String dateString = String.valueOf(date.getTime());
+            String imgFilePath = destPath+dateString+".jpg";//新生成的图片
+            GenerateImage(imgData,imgFilePath);
+            String a = returnPath+dateString+".jpg";
+            return AppResult.writeResultRep(a, "上传成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            return AppResult.writeResultFailure("上传失败");
+        }
+    }
+
+    /**
+     * 将64位生成新的图片
+     * @param imgData
+     * @param destPath
+     * @return
+     */
+    public static boolean GenerateImage(String imgData,String destPath)
+    {   //对字节数组字符串进行Base64解码并生成图片
+        if (imgData == null) //图像数据为空
+            return false;
+        BASE64Decoder decoder = new BASE64Decoder();
+        try
+        {
+            //Base64解码
+            byte[] b = decoder.decodeBuffer(imgData);
+            for(int i=0;i<b.length;++i)
+            {
+                if(b[i]<0)
+                {//调整异常数据
+                    b[i]+=256;
+                }
+            }
+            OutputStream out = new FileOutputStream(destPath);
+            out.write(b);
+            out.flush();
+            out.close();
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+
+}
